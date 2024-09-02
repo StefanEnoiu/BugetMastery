@@ -126,45 +126,44 @@
         .sold-verde, .sold-final {
             color: #00796b;
         }
-        /* Stiluri pentru pagina de autentificare */
-        .login-section {
-            display: none;
-            text-align: center;
-            margin: 20px;
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #e3f2fd;
         }
-        .login-section input {
-            margin: 10px;
-            padding: 10px;
-            font-size: 1em;
-        }
-        .login-section button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #00796b;
-            color: white;
-            border: none;
+        .login-container form {
+            background-color: #fff;
+            padding: 20px;
             border-radius: 5px;
-            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .login-section button:hover {
-            background-color: #004d40;
+        .login-container input {
+            margin-bottom: 10px;
+        }
+        .login-error {
+            color: #d32f2f;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Pagina de autentificare -->
-    <div id="login-section" class="login-section">
+    <div id="login-section" class="login-container">
         <h1>Autentificare</h1>
         <form id="login-form" onsubmit="authenticate(event)">
-            <input type="text" id="username" placeholder="Utilizator" required>
+            <input type="text" id="username" placeholder="Nume utilizator" required>
             <input type="password" id="password" placeholder="Parolă" required>
+            <label>
+                <input type="checkbox" id="show-password" onclick="togglePassword()"> Arată parola
+            </label>
             <button type="submit">Autentificare</button>
+            <p id="login-error" class="login-error">Nume utilizator sau parolă incorectă.</p>
         </form>
-        <p id="login-error" style="color: red; display: none;">Utilizator sau parolă incorectă.</p>
     </div>
 
-    <!-- Pagina de gestionare a bugetului -->
-    <div id="buget-section" style="display: none;">
+    <div id="buget-section" style="display:none;">
         <h1>Buget</h1>
 
         <div class="form-section">
@@ -215,11 +214,10 @@
 
         <div class="form-section">
             <h3>Adaugă Cheltuială</h3>
-            <form id="add-cheltuieli-form" onsubmit="addCheltuiala(event)">
+            <form id="add-cheltuiala-form" onsubmit="addCheltuiala(event)">
                 <input type="text" id="cheltuiala-descriere" placeholder="Descriere" required>
                 <input type="number" id="cheltuiala-suma" placeholder="Sumă" required>
                 <input type="date" id="cheltuiala-data" placeholder="Data" required>
-                <
                 <button type="submit">Adaugă</button>
             </form>
         </div>
@@ -240,8 +238,8 @@
     <script>
         // Date de autentificare
         const adminUsers = [
-            { username: 'Stefan Enoiu', password: 'Pituluș15' },
-            { username: 'Stefan Alexandra', password: 'Buduluș21' }
+            { username: 'Stefan Enoiu', password: 'Pitulush15' },
+            { username: 'Stefan Alexandra', password: 'Budulush21' }
         ];
 
         // Verifică autentificarea utilizatorului
@@ -255,33 +253,42 @@
             if (user) {
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('buget-section').style.display = 'block';
+                // Populează tabelul inițial
+                updateMonth();
             } else {
                 document.getElementById('login-error').style.display = 'block';
             }
         }
 
-        // Gestionarea bugetului
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+        }
+
+        // Variabile globale pentru buget
         let bugetInitial = 0;
         let totalIncasari = 0;
         let totalCheltuieli = 0;
+
+        // Cheltuieli predefinite
+        const cheltuieliPredefinite = [
+            { descriere: 'Nunta Vlad', suma: 2500, data: '2024-08-31' },
+            { descriere: 'Botez Petra', suma: 1500, data: '2024-09-03' },
+            { descriere: 'Tigari Grecia', suma: 500, data: '2024-09-05' },
+            { descriere: 'Benzina', suma: 300, data: '2024-09-05' },
+            { descriere: 'Grecia', suma: 4000, data: '2024-09-13' },
+            { descriere: 'Facultate El', suma: 2000, data: '2024-09-05' },
+            { descriere: 'Ziua Ei', suma: 2000, data: '2024-09-21' },
+            { descriere: 'BT El', suma: 100, data: '2024-09-25' },
+            { descriere: 'Rata Aer+Dyson Septembrie', suma: 650, data: '2024-09-25' }
+        ];
 
         const incasariDefault = [
             { descriere: 'Salariu El', suma: 0, data: '' },
             { descriere: 'Salariu Ea Spital', suma: 0, data: '' },
             { descriere: 'Salariu Ea Cabinet', suma: 0, data: '' },
             { descriere: 'Salariu Ea Cabinet CAS', suma: 0, data: '' }
-        ];
-
-        const cheltuieliDefault = [
-            { descriere: 'Nunta Vlad', suma: 2500, data: '2024-08-31' },
-            { descriere: 'Botez Petra', suma: 1500, data: '2024-09-03' },
-            { descriere: 'Tigari Grecia', suma: 500, data: '2024-09-05' },
-            { descriere: 'Benzina', suma: 300, data: '2024-09-05' },
-            { descriere: 'Grecia (vacanță)', suma: 4000, data: '2024-09-05' },
-            { descriere: 'Facultate El', suma: 2000, data: '2024-09-05' },
-            { descriere: 'Ziua Ei', suma: 2000, data: '2024-09-21' },
-            { descriere: 'Rata Aer+Dyson Septembrie', suma: 650, data: '2024-09-25' },
-            { descriere: 'BT El', suma: 100, data: '2024-09-25' }
         ];
 
         function updateMonth() {
@@ -291,7 +298,7 @@
 
             if (isSeptember2024) {
                 populateTable(incasariDefault, 'incasari');
-                populateTable(cheltuieliDefault, 'cheltuieli');
+                populateTable(cheltuieliPredefinite, 'cheltuieli');
             } else {
                 document.getElementById('incasari-body').innerHTML = '';
                 document.getElementById('cheltuieli-body').innerHTML = '';
@@ -401,10 +408,6 @@
             // Simulate saving to a server or local storage
             alert('Modificările au fost salvate!');
         }
-
-        // Initialize login page
-        document.getElementById('login-section').style.display = 'block';
-        document.getElementById('buget-section').style.display = 'none';
     </script>
 </body>
 </html>
